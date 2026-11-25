@@ -50,17 +50,18 @@ $("message-form").addEventListener("submit",e=>{e.preventDefault();try{if(send(C
 buttons.forEach(b=>b.addEventListener("click",()=>send(b.dataset.cue)));
 $("disconnect").onclick=()=>{const id=$("destination").value,c=peers.get(id);if(c){peers.delete(id);c.close();refresh();}};
 $("clear").onclick=()=>$("log").replaceChildren();
+$("copy-id").onclick=async()=>{try{await navigator.clipboard.writeText(ownId);status("Session ID copied");}catch{status("Select and copy your session ID above.");}};
 $("copy").onclick=async()=>{try{await navigator.clipboard.writeText(invite);status("Pairing link copied");}catch{status("Copy the pairing URL shown above.");}};
 if(!window.Peer){status("PeerJS failed to load. Reload with an internet connection.");return;}
-peer=new Peer(null,{debug:1});
+try{peer=new Peer(C.sessionId(),{debug:1});}catch(e){status("Unable to generate a secure session ID: "+String(e));return;}
 peer.on("open",id=>{
   ownId=id;signaling=true;$("own-id").textContent=id;invite=C.invite(location.href,id);
-  $("invite").href=invite;$("invite").textContent=invite;$("invite").hidden=false;$("copy").disabled=false;
+  $("invite").href=invite;$("invite").textContent=invite;$("invite").hidden=false;$("copy").disabled=false;$("copy-id").disabled=false;
   try{if(!window.QRCode)throw Error("QR unavailable");$("qr").replaceChildren();$("qr").hidden=false;new QRCode($("qr"),{text:invite,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});}catch{$("qr").hidden=true;}
   status("Ready. Share your pairing link or connect to another peer.");refresh();
 });
 peer.on("connection",c=>attach(c,true));
 peer.on("disconnected",()=>{signaling=false;status("Signaling disconnected. Existing data channels may remain open.");refresh();try{peer.reconnect();}catch{}});
-peer.on("close",()=>{signaling=false;peers.clear();pending.clear();$("qr").hidden=true;$("invite").hidden=true;$("copy").disabled=true;renderPending();refresh();status("Peer closed. Reload to start a new session.");});
+peer.on("close",()=>{signaling=false;peers.clear();pending.clear();$("qr").hidden=true;$("invite").hidden=true;$("copy").disabled=true;$("copy-id").disabled=true;renderPending();refresh();status("Peer closed. Reload to start a new session.");});
 peer.on("error",e=>{status("PeerJS: "+String(e));refresh();});
 })();

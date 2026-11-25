@@ -5,6 +5,12 @@ function id(value){
   if(typeof value!=="string" || value.length>128 || !/^[a-zA-Z0-9]+(?:[-_ ][a-zA-Z0-9]+)*$/.test(value))throw Error("Invalid PeerJS session ID");
   return value;
 }
+// 128 random bits, encoded as one selectable word. This is not an identity or secret.
+function sessionId(cryptoSource=root.crypto){
+  const bytes=new Uint8Array(16);
+  cryptoSource.getRandomValues(bytes);
+  return Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
+}
 function invite(base,value){
   const u=new URL("peer.html",base);u.search="";u.hash="";u.searchParams.set("connect",id(value));return u.href;
 }
@@ -22,6 +28,6 @@ function decode(value){
   return {type:CUES.includes(value)?"cue":"text",value};
 }
 function encodeText(value){const data=decode(value);if(!data||data.type!=="text")throw Error("Enter text, or use the separate cue buttons for reserved cue words.");return data.value;}
-const api={CUES,id,invite,fromInput,fromLocation,decode,encodeText};
+const api={CUES,id,sessionId,invite,fromInput,fromLocation,decode,encodeText};
 if(typeof module!=="undefined"&&module.exports)module.exports=api;else root.CuePeerCore=api;
 })(typeof window!=="undefined"?window:globalThis);
