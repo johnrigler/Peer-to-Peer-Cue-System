@@ -13,3 +13,10 @@ jobs:
         with:
           node-version: '20'
       - run: node --check peer.js && node --test tests/peer-core.test.cjs
+      - uses: actions/checkout@v4
+        with:
+          repository: johnrigler/chisel
+          ref: fa0ce255b92b913e85637104f0cebcb7e60b5700
+          path: chisel-sdk
+          persist-credentials: false
+      - run: node --check signed-peer.js && node --test tests/signed-core.test.cjs
