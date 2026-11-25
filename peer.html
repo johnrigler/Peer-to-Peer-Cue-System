@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Peer-to-Peer Cue System | Peer</title>
+<style>
+*{box-sizing:border-box}body{font:16px system-ui,sans-serif;max-width:820px;margin:auto;padding:16px;background:#111827;color:#f3f4f6}a{color:#93c5fd}section{background:#1f2937;padding:16px;border-radius:8px;margin:12px 0}h1{font-size:1.6rem}h2{font-size:1.1rem;margin:0 0 12px}label{display:block;margin:8px 0}input,button,select{font:inherit;padding:10px;border:1px solid #64748b;border-radius:5px}input,select{width:100%;background:#111827;color:white}button{background:#334155;color:white;margin:4px 4px 4px 0;cursor:pointer}button:disabled{opacity:.45;cursor:default}#qr{display:inline-block;background:white;padding:12px;max-width:100%}#invite,#status,#own-id{overflow-wrap:anywhere}#cue{padding:24px;text-align:center;font-size:2rem;font-weight:bold;background:#374151;border-radius:8px}#cue[data-state=Go]{background:#166534}#cue[data-state=Fade]{background:#92400e}#cue[data-state=Off]{background:#991b1b}#log{white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto}small{color:#cbd5e1}.pending{margin:8px 0;overflow-wrap:anywhere}
+</style>
+<script defer src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
+<script defer src="vendor/qrcode.min.js"></script>
+<script defer src="peer-core.js"></script>
+<script defer src="peer.js"></script>
+</head>
+<body>
+<h1>Peer-to-Peer Cue System</h1>
+<p><a href="./">Project home</a> · <a href="send.html">Legacy sender</a> · <a href="receive.html">Legacy receiver</a></p>
+<p>Every device can send and receive. WebRTC transport is encrypted; peer identities and messages are not cryptographically authenticated in this version.</p>
+<section>
+<h2>Pair a device</h2>
+<p id="status" role="status">Starting PeerJS…</p>
+<p>My session ID: <strong id="own-id">Waiting</strong></p>
+<div id="qr" hidden></div>
+<p><a id="invite" hidden>Open pairing link</a></p>
+<button id="copy-id" disabled>Copy session ID</button>
+<button id="copy" disabled>Copy pairing link</button>
+<form id="connect-form">
+<label for="remote">Remote session ID or pairing URL</label><input id="remote" required maxlength="2048" autocomplete="off" autocapitalize="none" spellcheck="false">
+<button id="connect" disabled>Connect</button>
+</form>
+<div id="pending" aria-live="polite"></div>
+</section>
+<section>
+<h2>Connected peers</h2>
+<label for="destination">Send to</label><select id="destination" disabled></select>
+<button id="disconnect" disabled>Disconnect selected peer</button>
+<div id="cue" role="status" data-state="Reset">Standby</div>
+<div id="cue-buttons"><button data-cue="Reset" disabled>Reset</button><button data-cue="Go" disabled>Go</button><button data-cue="Fade" disabled>Fade</button><button data-cue="Off" disabled>Off</button></div>
+<form id="message-form"><label for="message">Message</label><input id="message" maxlength="4096" autocomplete="off" required><button id="send" disabled>Send</button></form>
+<small>Original cue words are reserved in legacy mode. Only accepted connections can change the visual cue.</small>
+<div id="log" role="log" aria-live="polite"></div><button id="clear">Clear local log</button>
+</section>
+</body>
+</html>
